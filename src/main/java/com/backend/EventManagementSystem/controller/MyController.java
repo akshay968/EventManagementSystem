@@ -3,6 +3,9 @@ package com.backend.EventManagementSystem.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +40,7 @@ public class MyController {
     
      @PostMapping("/addEvent")
      public ResponseEntity<?> addEvent(@RequestBody Event event){
-    	 Event event1=new Event("Between thus table","Port Rebeccaberg","2024-03-01","18:00:00", 38.33354302,157.9579286);
-    	 Event save=this.eventRespository.save(event1);
-
+    	 Event save=this.eventRespository.save(event);
     	 return ResponseEntity.ok(save);
      }
      @PostMapping(value = "/events/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -64,27 +65,59 @@ public class MyController {
     	return "Welcome to EventManagement APIService";
     }
 	@GetMapping("events/find")
-    public Page  find(@RequestParam String startDate,@RequestParam Double latitude,@RequestParam Double longitude,@RequestParam(required = false, defaultValue = "0") int page,@RequestParam(required=false, defaultValue = "10") int size) {
-       
-    	return  eventService.getResultEvents(startDate,latitude,longitude,page,size);
+    public ResponseEntity<?>  find(@RequestParam String startDate,@RequestParam Double latitude,@RequestParam Double longitude,@RequestParam(required = false, defaultValue = "0") int page,@RequestParam(required=false, defaultValue = "10") int size) {
+        if (startDate == null || latitude == null || longitude == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Required parameters missing");
+        }
+         Date date;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+        } catch (ParseException e) {
+        	System.out.println("sffasf");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body("Invalid date format. Please use yyyy-MM-dd format");
+        }
+        if (!isValidLatitude(latitude) || !isValidLongitude(longitude))
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body("Invalid latitude or longitude values");
+        
+    	return  ResponseEntity.ok(eventService.getResultEvents(startDate,latitude,longitude,page,size));
     }
 
 	@GetMapping("weather")
-	public String getweather(@RequestParam String city,@RequestParam String date){
-		return weatherService.getWeatherConditions(city,date);
+	public ResponseEntity<?>  getweather(@RequestParam String city,@RequestParam String date){
+		 Date date1;
+		try {
+            date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (ParseException e) {
+            return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body("Invalid date format. Please use yyyy-MM-dd format");
+        }
+		return  ResponseEntity.ok(weatherService.getWeatherConditions(city,date));
 
 	}
 	@GetMapping("distance")
-	public Double getDistance( @RequestParam("latitude1") double latitude1,
+	public ResponseEntity<?> getDistance( @RequestParam("latitude1") double latitude1,
             @RequestParam("longitude1") double longitude1,
             @RequestParam("latitude2") double latitude2,
             @RequestParam("longitude2") double longitude2){
-//		
-		return distanceService.getDistance(latitude1,longitude1,latitude2,longitude2);
+                if (!isValidLatitude(latitude1) || !isValidLongitude(longitude1) ||
+                !isValidLatitude(latitude2) || !isValidLongitude(longitude2)) {
+                return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body("Invalid latitude or longitude values");
+            }
+		return  ResponseEntity.ok(distanceService.getDistance(latitude1,longitude1,latitude2,longitude2));
 
 	}
-//	@GetMapping("events/addEvent")
-//	public void addEvent() {
-//    	return ;
-//    }
+
+
+    private boolean isValidLatitude(double latitude) {
+        return latitude >= -90 && latitude <= 90;
+    }
+
+   
+    private boolean isValidLongitude(double longitude) {
+        return longitude >= -180 && longitude <= 180;
+    }
+
 }

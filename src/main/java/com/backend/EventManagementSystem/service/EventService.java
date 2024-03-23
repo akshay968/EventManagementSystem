@@ -29,26 +29,20 @@ public class EventService {
 	  @Autowired
 	 private  DistanceService distanceService=new DistanceService();
 	  @Autowired
-	   private final MongoTemplate mongoTemplate;
+	 private final MongoTemplate mongoTemplate;
 	  @Autowired
-	    private EventRepository eventRespository;
-	  	
-		private List<Event> eventsList;
-		private List<Event> resultEventsList;
-		  @Autowired
-		 public EventService(MongoTemplate mongoTemplate) {
+	 private EventRepository eventRespository; 	
+	 private List<Event> eventsList;
+	 private List<Event> resultEventsList;
+	 @Autowired
+	 public EventService(MongoTemplate mongoTemplate) {
 			 this.mongoTemplate=mongoTemplate;
 			 eventsList=new ArrayList();
 			 resultEventsList=new ArrayList();
-			  
-	    
-		 }
-	  
-	
-		  public List<Event> getEvents(){
-			  
+			 }
+	 public List<Event> getEvents(){		  
 			return  eventsList;
-		}
+	 }
 	  
 	  public void addEventsFromCsv(List<String[]> csvLines) {
 	        // Assuming the CSV structure: eventName, cityName, date, time, latitude, longitude
@@ -65,43 +59,41 @@ public class EventService {
 	            String time = line[3];
 	            Double latitude = Double.parseDouble(line[4]);
 	            Double longitude = Double.parseDouble(line[5]);
-
 	            Event event = new Event(eventName, cityName, date, time, latitude, longitude);
 	       	    Event save=this.eventRespository.save(event);
-
 	        }
 	        }
 	        
-	  public Page getResultEvents(String startDate,Double latitude,Double longitude,int page,int size){
+	   public Page getResultEvents(String startDate,Double latitude,Double longitude,int page,int size){
 		  Query query=new Query();
 	         Date date1=null;
 	       try {
 		        date1=new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//	       Finding next 14 th day
 	       Calendar calendar = Calendar.getInstance();
 	       calendar.setTime(date1);
 	       calendar.add(Calendar.DAY_OF_MONTH, 14);
 	       Date nextDate = calendar.getTime();
 	       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	       String endDate = sdf.format(nextDate);
-	       System.out.println(endDate);
-	        Criteria criteria=new Criteria().where("date").gte(startDate).lte(endDate);
+//	       Query
+	       Criteria criteria=new Criteria().where("date").gte(startDate).lte(endDate);
 	        query.addCriteria(criteria);
 	        query.with(Sort.by(Sort.Direction.ASC, "date"));
-
+//          Finding total size of results
 	        AggregationOperation matchOperation = Aggregation.match(criteria);
 	        AggregationOperation countOperation = Aggregation.count().as("totalEvents");
-
 	        Aggregation aggregation = Aggregation.newAggregation(matchOperation, countOperation);
 	        Page result = mongoTemplate.aggregate(aggregation, "events", Page.class).getUniqueMappedResult();
 	        Pageable pageable = PageRequest.of(page, size);
             query.with(pageable);
 	       resultEventsList = mongoTemplate.find(query, Event.class);
 	       List<Results>finalResults =new ArrayList(); 
-	       
+	         if(result==null)
+	        	 result=new Page();
 	       for(Event event:resultEventsList) {
 	    	    
 	    	   String weather=weatherService.getWeatherConditions(event.getCity_name(), event.getDate());
@@ -109,6 +101,7 @@ public class EventService {
 	    	   Results res=new Results(event,weather,distance);
 	    	   finalResults.add(res);
 	       }
+	       //Set page details
 	       result.setEvents(finalResults);
 	       result.setPage(page);
 	       result.setPageSize(size);

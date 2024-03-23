@@ -19,6 +19,7 @@ public class Event {
 	private String time;
 	private Double latitude;
 	private Double longitude;
+	
 	public Event(String event_name, String city_name, String date, String time, Double latitude, Double longitude) {
 		super();
 		
