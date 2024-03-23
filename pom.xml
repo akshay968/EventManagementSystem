@@ -96,5 +96,5 @@
 			</plugin>
 		</plugins>
 	</build>
-<finalName>springboot-mongo-docker.jar</finalName>
+
 </project>
