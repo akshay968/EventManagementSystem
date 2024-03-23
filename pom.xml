@@ -62,7 +62,11 @@
 		    <version>1.18.32</version>
 		    <scope>provided</scope>
 		</dependency>
-		<groupId>org.mongodb</groupId> 			<artifactId>mongodb-driver-sync</artifactId> <version>4.2</version>
+		<dependency>
+		<groupId>org.mongodb</groupId> 		
+			<artifactId>mongodb-driver-sync</artifactId> 
+			<version>4.2</version>
+			</dependency>
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
 <dependency>
     <groupId>io.springfox</groupId>
