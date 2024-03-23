@@ -11,6 +11,6 @@ RUN mvn package -DskipTests
 # Stage 2: Runtime Stage
 FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
-COPY --from=build /app/target/EventManagement-0.0.1-SNAPSHOT.jar EventManagement.jar
+COPY --from=build /app/target/EventManagementSystem-0.0.1-SNAPSHOT.jar EventManagement.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","EventManagement.jar"]
