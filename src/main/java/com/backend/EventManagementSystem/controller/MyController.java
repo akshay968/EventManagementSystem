@@ -34,7 +34,7 @@ public class MyController {
     private DistanceService distanceService;
    @Autowired
     private EventRepository eventRespository;
-  
+    
      @PostMapping("/addEvent")
      public ResponseEntity<?> addEvent(@RequestBody Event event){
     	 Event event1=new Event("Between thus table","Port Rebeccaberg","2024-03-01","18:00:00", 38.33354302,157.9579286);
@@ -57,6 +57,12 @@ public class MyController {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process CSV file");
 
      }
+
+     @GetMapping("/")
+    public String  home() {
+       
+    	return "Welcome to EventManagement APIService";
+    }
 	@GetMapping("events/find")
     public Page  find(@RequestParam String startDate,@RequestParam Double latitude,@RequestParam Double longitude,@RequestParam(required = false, defaultValue = "0") int page,@RequestParam(required=false, defaultValue = "10") int size) {
        
