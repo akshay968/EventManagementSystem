@@ -36,7 +36,7 @@ https://eventmanagementsystem-9du6.onrender.com/<br />
   <br />
  Sample Request through browser<br />
  findevent API<br />
- https://eventmanagementsystem-9du6.onrender.com/events/find?startDate=2024-03-01&longitude=-740.0060&latitude=40.7128%20&page=1<br />
+ https://eventmanagementsystem-9du6.onrender.com/events/find?startDate=2024-03-15&longitude=-74.0060&latitude=40.7128%20&page=1<br />
  distance API<br />
  https://eventmanagementsystem-9du6.onrender.com/distance?latitude1=40.7128&longitude1=-74.0060&latitude2=25.5169968004073&longitude2=-173.22570039222800<br />
  weather API<br />
